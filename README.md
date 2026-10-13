@@ -14,14 +14,19 @@ Requires Python 3.12 or higher. I suggest creating a virtual env for this applic
 
 Once in your virtual env, run `pip install --upgrade pip` and `pip install -r requirements.txt`
 
-After pip finishes, you can run `dbadmin` and `proxy`.
+After pip finishes, update the db with `alembic upgrade head`.
+Once that's done, you can run `dbadmin` and `proxy`.
 
-## DBAdmin
+## dbadmin
+`py ./dbadmin`
+
 this is dogshit temp ai slop that i built to easily test and make the db
 
 will be replaced with real tools
 
 ## proxy
+`py ./proxy`
+
 This is the core proxy server. It can be started purely with args or with a config file.
 
 ```fix
