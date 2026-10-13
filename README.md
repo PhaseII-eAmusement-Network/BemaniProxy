@@ -11,16 +11,19 @@ Currently, we're just using SQLite3 as the DB.
 Requires Python 3.12 or higher. I suggest creating a virtual env for this application.
 
 `python -m venv venv` (creates a virtual env as `venv`) (and then activate the venv)
+
 Once in your virtual env, run `pip install --upgrade pip` and `pip install -r requirements.txt`
 
 After pip finishes, you can run `dbadmin` and `proxy`.
 
 ## DBAdmin
 this is dogshit temp ai slop that i built to easily test and make the db
+
 will be replaced with real tools
 
 ## proxy
 This is the core proxy server. It can be started purely with args or with a config file.
+
 ```fix
 usage: proxy [-h] [-p PORT] [-a ADDRESS] [-r REAL_ADDRESS] -q REMOTE_PORT -b REMOTE_ADDRESS [-c CONFIG] [-k KEEPALIVE] [-v] [-t TIMEOUT]
 
@@ -45,6 +48,7 @@ options:
   -t TIMEOUT, --timeout TIMEOUT
                         Timeout (in seconds) for proxy requests. Defaults to 30 seconds.
 ```
+
 (currently the config file doesn't work, don't use it)
 
 # Open Source Software
