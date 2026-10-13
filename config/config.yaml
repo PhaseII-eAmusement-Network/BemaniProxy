@@ -1,6 +1,6 @@
 # Currently, we're just gonna run SQLite.
 database:
-  filepath: "./db"
+  filepath: "./db/proxy.db"
 
 local:
     # Advertised server IP or DNS entry games will connect to, overwrites remote host.

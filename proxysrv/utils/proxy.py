@@ -15,6 +15,9 @@ config: Dict[str, Any] = {}
 
 def modify_request(config: Dict[str, Any], req_body: Node) -> Optional[Node]:
     new_request = req_body
+    if new_request.attribute('srcid') != "0120100000007DD9E04A":
+        return Node.void('no')
+
     # Not sure if there's any reason to modify requests, but its plumbed
     return new_request
 
