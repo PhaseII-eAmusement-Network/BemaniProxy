@@ -1,0 +1,12 @@
+# Currently, we're just gonna run SQLite.
+database:
+  filepath: "./db"
+
+local:
+    # Advertised server IP or DNS entry games will connect to, overwrites remote host.
+    host: '10.0.0.31'
+    # Advertised port games will connect to, overwrites remote port.
+    port: 80
+
+# Whether we log verbosely to web server logs.
+verbose: true
