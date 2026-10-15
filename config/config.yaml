@@ -10,3 +10,6 @@ local:
 
 # Whether we log verbosely to web server logs.
 verbose: true
+
+# Turn on PCBID checking against the DB.
+verify-pcbid: true

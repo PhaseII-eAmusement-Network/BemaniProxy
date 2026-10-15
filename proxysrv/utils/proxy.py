@@ -7,6 +7,8 @@ from typing import Any, Dict, Optional
 import urllib.parse as urlparse
 
 from proxysrv.protocol import EAmuseProtocol, Node
+from proxysrv.data.database import DBBase
+from proxysrv.data.endpoints import PCBIDData
 
 # Application configuration
 app = Flask(__name__)
@@ -15,8 +17,6 @@ config: Dict[str, Any] = {}
 
 def modify_request(config: Dict[str, Any], req_body: Node) -> Optional[Node]:
     new_request = req_body
-    if new_request.attribute('srcid') != "0120100000007DD9E04A":
-        return Node.void('no')
 
     # Not sure if there's any reason to modify requests, but its plumbed
     return new_request
@@ -130,7 +130,15 @@ def receive_request(path: str) -> Response:
         print(req)
 
     # Grab PCBID for directing to mulitple servers
-    pcbid = "0120100000ADD905C863"
+    pcbid = req.attribute("srcid")
+    pcbdata = PCBIDData.search_pcbid(pcbid)
+    if config['verify-pcbid']: 
+        if pcbdata == None:
+            return Response("Unknown PCBID", 500)
+        
+        if not pcbdata.get('verified', False):
+            return Response("Unverified PCBID", 500)
+
     if pcbid in config['remote']:
         remote_host = config['remote'][pcbid]['host']
         remote_port = config['remote'][pcbid]['port']
@@ -256,24 +264,15 @@ def load_config(filename: str) -> None:
         'local_host': config_data['local']['host'],
         'local_port': config_data['local']['port'],
         'verbose': config_data.get('verbose', False),
+        'verify-pcbid': config_data.get('verify-pcbid', False),
         'timeout': config_data.get('timeout', 30),
         'keepalive': config_data.get('keepalive', 'localhost'),
     })
 
-    if 'default' in config_data:
-        remote_config = config_data['remote'][config_data['default']]
-        config.update({
-            'remote': {
-                '*': remote_config,
-            },
-        })
-    else:
-        config.update({
-            'remote': {}
-        })
-
     if 'pcbid' in config_data and config_data['pcbid'] is not None:
         load_proxy_config(filename)
+
+    DBBase.update_config(config_data['database'])
 
 
 if __name__ == '__main__':
@@ -285,7 +284,9 @@ if __name__ == '__main__':
     parser.add_argument("-b", "--remote-address", help="Address to connect to.", type=str, required=True)
     parser.add_argument("-c", "--config", help="Configuration file for PCBID to remote server mapping.", type=str, default=None)
     parser.add_argument("-k", "--keepalive", help="Keepalive domain to advertise. Defaults to localhost", type=str, default='localhost')
+    parser.add_argument("-d", "--database", help="The path to your SQLite DB file. Defaults to ./db/proxy.db", type=str, default='./db/proxy.db')
     parser.add_argument("-v", "--verbose", help="Display verbose packet info.", action='store_true')
+    parser.add_argument("-P", "--verify-pcbid", help="Verify the active PCBID.", action='store_true')
     parser.add_argument("-t", "--timeout", help="Timeout (in seconds) for proxy requests. Defaults to 30 seconds.", type=int, default=30)
     args = parser.parse_args()
 
@@ -299,9 +300,12 @@ if __name__ == '__main__':
             },
         },
         'verbose': args.verbose,
+        'verify-pcbid': args.verify_pcbid,
         'timeout': args.timeout,
         'keepalive': args.keepalive,
     })
+
+    DBBase.update_config({"filepath": "./db/proxy.db"})
 
     # Fill in remote addresses for PCBIDs we should redirect to a non-default server
     if args.config is not None:

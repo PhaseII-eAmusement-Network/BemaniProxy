@@ -12,7 +12,7 @@ class DBBase:
     SessionLocal = None
 
     @staticmethod
-    def updateConfig(db_config: Dict[str, Any]) -> None:
+    def update_config(db_config: Dict[str, Any]) -> None:
         filepath = db_config.get('filepath', '')
         DATABASE_PATH = Path(filepath)
         DATABASE_PATH.parent.mkdir(
@@ -28,6 +28,7 @@ class DBBase:
             },
         )
         DBBase.SessionLocal = sessionmaker(bind=DBBase.engine)
+        print('BemaniProxy DB Loaded!')
 
 if DBBase.engine:
     Base.metadata.create_all(DBBase.engine)
